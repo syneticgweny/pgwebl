@@ -25,6 +25,8 @@
     </script>
 
     @yield('script')
+
+    @include('componens.toast')
 </body>
 
 </html>
