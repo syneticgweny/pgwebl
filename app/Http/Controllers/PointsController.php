@@ -39,28 +39,46 @@ class PointsController extends Controller
     {
 
         // Validation request
-        $request->validate([
-            'name' => 'required|unique:point,name',
-            'description' => 'required',
-            'geom_point' => 'required',
-        ],
-        [
-            'name.required' => 'Name is required',
-            'name.unique' => 'Name already exist',
-            'description.required' => 'Description is required',
-            'geom_point.required' => 'Geometry is required',
-        ]);
+        $request->validate(
+            [
+                'name' => 'required|unique:point,name',
+                'description' => 'required',
+                'geom_point' => 'required',
+                'image' => 'nullable|mimes:jpeg,png,jpg,gif,svg|max:2000',
+            ],
+            [
+                'name.required' => 'Name is required',
+                'name.unique' => 'Name already exist',
+                'description.required' => 'Description is required',
+                'geom_point.required' => 'Geometry is required',
+            ]
+        );
+
+        // Create Image Directory if not exist
+        if (!is_dir('storage/images')) {
+            mkdir('./storage/images', 0777);
+        }
+
+        // Get image file
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $name_image = time() . "_point." . strtolower($image->getClientOriginalExtension());
+            $image->move('storage/images', $name_image);
+        } else {
+            $name_image = null;
+        }
 
         $data = [
             'geom' => $request->geom_point,
             'name' => $request->name,
             'description' => $request->description,
+            'image' => $name_image,
         ];
 
 
 
         // Create data
-        if (!$this->points->create($data)){
+        if (!$this->points->create($data)) {
             return redirect()->route('map')->with('error', 'Point failed to add');
         }
 
