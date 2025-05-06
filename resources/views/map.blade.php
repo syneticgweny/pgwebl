@@ -231,10 +231,19 @@
         // GeoJSON Point
         var point = L.geoJson(null, {
             onEachFeature: function(feature, layer) {
+
+
                 var popupContent = "Nama: " + feature.properties.name + "<br>" +
                     "Deskripsi: " + feature.properties.description + "<br>" +
                     "Dibuat: " + feature.properties.created_at + "<br>" +
-                    "<img src='{{ asset('storage/images') }}/" + feature.properties.image + "' width='200' alt=''>";
+                    "<img src='{{ asset('storage/images') }}/" + feature.properties.image +
+                    "' width='200' alt=''>" + "<br>" +
+                    "<form method='POST' action='{{ url('points') }}/" + feature.properties.id + "'>" +
+                    '{{ csrf_field() }}' + '@method('DELETE')' +
+                    "<button type='submit' class= 'btn btn-sm btn-danger' onclick='return confirm(`Yakin akan dihapus?`)'><i class='fa-solid fa-trash'></i></button>" +
+                    "</form>";
+
+
                 layer.on({
                     click: function(e) {
                         point.bindPopup(popupContent);
@@ -257,7 +266,12 @@
                     "Deskripsi: " + feature.properties.description + "<br>" +
                     "Panjang: " + feature.properties.length_km.toFixed(2) + "km<br>" +
                     "Dibuat: " + feature.properties.created_at + "<br>" +
-                    "<img src='{{ asset('storage/images') }}/" + feature.properties.image + "' width='200'>";;
+                    "<img src='{{ asset('storage/images') }}/" + feature.properties.image + "' width='200'>" +
+                    "<br>" +
+                    "<form method='POST' action='{{ url('polylines') }}/" + feature.properties.id + "'>" +
+                    '{{ csrf_field() }}' + '@method('DELETE')' +
+                    "<button type='submit' class= 'btn btn-sm btn-danger' onclick='return confirm(`Yakin akan dihapus?`)'><i class='fa-solid fa-trash'></i></button>" +
+                    "</form>";
                 layer.on({
                     click: function(e) {
                         polylines.bindPopup(popupContent);
@@ -280,7 +294,12 @@
                     "Deskripsi: " + feature.properties.description + "<br>" +
                     "Luas: " + feature.properties.area_km2.toFixed(2) + "km<sup>2</sup><br>" +
                     "Dibuat: " + feature.properties.created_at + "<br>" +
-                    "<img src='{{ asset('storage/images') }}/" + feature.properties.image + "' width='200'>";;
+                    "<img src='{{ asset('storage/images') }}/" + feature.properties.image + "' width='200'>" +
+                    "<br>" +
+                    "<form method='POST' action='{{ url('polygons') }}/" + feature.properties.id + "'>" +
+                    '{{ csrf_field() }}' + '@method('DELETE')' +
+                    "<button type='submit' class= 'btn btn-sm btn-danger' onclick='return confirm(`Yakin akan dihapus?`)'><i class='fa-solid fa-trash'></i></button>" +
+                    "</form>";
                 layer.on({
                     click: function(e) {
                         polygons.bindPopup(popupContent);

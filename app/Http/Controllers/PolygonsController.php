@@ -33,18 +33,20 @@ class PolygonsController extends Controller
     public function store(Request $request)
     {
         // Validation request
-        $request->validate([
-            'name' => 'required|unique:polygon,name',
-            'description' => 'required',
-            'geom_polygon' => 'required',
-            'image' => 'nullable|mimes:jpeg,png,jpg,gif,svg|max:2000',
-        ],
-        [
-            'name.required' => 'Name is required',
-            'name.unique' => 'Name already exist',
-            'description.required' => 'Description is required',
-            'geom_polygon.required' => 'Geometry is required',
-        ]);
+        $request->validate(
+            [
+                'name' => 'required|unique:polygon,name',
+                'description' => 'required',
+                'geom_polygon' => 'required',
+                'image' => 'nullable|mimes:jpeg,png,jpg,gif,svg|max:2000',
+            ],
+            [
+                'name.required' => 'Name is required',
+                'name.unique' => 'Name already exist',
+                'description.required' => 'Description is required',
+                'geom_polygon.required' => 'Geometry is required',
+            ]
+        );
 
         // Create Image Directory if not exist
         if (!is_dir('storage/images')) {
@@ -70,7 +72,7 @@ class PolygonsController extends Controller
 
 
         // Create data
-        if (!$this->polygons->create($data)){
+        if (!$this->polygons->create($data)) {
             return redirect()->route('map')->with('error', 'Polygon failed to add');
         }
 
@@ -107,6 +109,20 @@ class PolygonsController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+
+        $imagefile = $this->polygons->find($id)->image;
+
+        if (!$this->polygons->destroy($id)) {
+            return redirect()->route('map')->with('error', 'Polygon failed to delete');
+        }
+
+        // Delete image
+        if ($imagefile != null) {
+            if (file_exists('storage/images/' . $imagefile)) {
+                unlink('storage/images/' . $imagefile);
+            }
+        }
+        
+        return redirect()->route('map')->with('success', 'Polygon deleted successfully');
     }
 }
