@@ -232,16 +232,26 @@
         var point = L.geoJson(null, {
             onEachFeature: function(feature, layer) {
 
+                var routeedit = "{{ route('points.edit', ':id') }}";
+                routeedit = routeedit.replace(':id', feature.properties.id);
+
 
                 var popupContent = "Nama: " + feature.properties.name + "<br>" +
                     "Deskripsi: " + feature.properties.description + "<br>" +
                     "Dibuat: " + feature.properties.created_at + "<br>" +
                     "<img src='{{ asset('storage/images') }}/" + feature.properties.image +
                     "' width='200' alt=''>" + "<br>" +
+                    "<div class='row mt-4'>" +
+                    "<div class='col-6 text-end'>" +
+                    "<a href='" + routeedit +"'  class='btn btn-sm btn-warning'><i class='fa-solid fa-pen-to-square'></i></a>" +
+                    "</div>" +
+                    "<div class='col-6'>" +
                     "<form method='POST' action='{{ url('points') }}/" + feature.properties.id + "'>" +
                     '{{ csrf_field() }}' + '@method('DELETE')' +
                     "<button type='submit' class= 'btn btn-sm btn-danger' onclick='return confirm(`Yakin akan dihapus?`)'><i class='fa-solid fa-trash'></i></button>" +
                     "</form>";
+                "</div>" +
+                "</div>";
 
 
                 layer.on({
@@ -262,16 +272,27 @@
         // GeoJSON Polylines
         var polylines = L.geoJson(null, {
             onEachFeature: function(feature, layer) {
+
+                var routeedit = "{{ route('polylines.edit', ':id') }}";
+                routeedit = routeedit.replace(':id', feature.properties.id);
+
                 var popupContent = "Nama: " + feature.properties.name + "<br>" +
                     "Deskripsi: " + feature.properties.description + "<br>" +
                     "Panjang: " + feature.properties.length_km.toFixed(2) + "km<br>" +
                     "Dibuat: " + feature.properties.created_at + "<br>" +
                     "<img src='{{ asset('storage/images') }}/" + feature.properties.image + "' width='200'>" +
                     "<br>" +
+                    "<div class='row mt-4'>" +
+                    "<div class='col-6 text-end'>" +
+                    "<a href='" + routeedit +"'  class='btn btn-sm btn-warning'><i class='fa-solid fa-pen-to-square'></i></a>" +
+                    "</div>" +
+                    "<div class='col-6'>" +
                     "<form method='POST' action='{{ url('polylines') }}/" + feature.properties.id + "'>" +
                     '{{ csrf_field() }}' + '@method('DELETE')' +
                     "<button type='submit' class= 'btn btn-sm btn-danger' onclick='return confirm(`Yakin akan dihapus?`)'><i class='fa-solid fa-trash'></i></button>" +
                     "</form>";
+                "</div>" +
+                "</div>";
                 layer.on({
                     click: function(e) {
                         polylines.bindPopup(popupContent);
@@ -290,16 +311,27 @@
         // GeoJSON Polygons
         var polygons = L.geoJson(null, {
             onEachFeature: function(feature, layer) {
+
+                var routeedit = "{{ route('polygons.edit', ':id') }}";
+                routeedit = routeedit.replace(':id', feature.properties.id);
+
                 var popupContent = "Nama: " + feature.properties.name + "<br>" +
                     "Deskripsi: " + feature.properties.description + "<br>" +
                     "Luas: " + feature.properties.area_km2.toFixed(2) + "km<sup>2</sup><br>" +
                     "Dibuat: " + feature.properties.created_at + "<br>" +
                     "<img src='{{ asset('storage/images') }}/" + feature.properties.image + "' width='200'>" +
                     "<br>" +
+                    "<div class='row mt-4'>" +
+                    "<div class='col-6 text-end'>" +
+                    "<a href='" + routeedit +"'  class='btn btn-sm btn-warning'><i class='fa-solid fa-pen-to-square'></i></a>" +
+                    "</div>" +
+                    "<div class='col-6'>" +
                     "<form method='POST' action='{{ url('polygons') }}/" + feature.properties.id + "'>" +
                     '{{ csrf_field() }}' + '@method('DELETE')' +
                     "<button type='submit' class= 'btn btn-sm btn-danger' onclick='return confirm(`Yakin akan dihapus?`)'><i class='fa-solid fa-trash'></i></button>" +
                     "</form>";
+                "</div>" +
+                "</div>";
                 layer.on({
                     click: function(e) {
                         polygons.bindPopup(popupContent);
