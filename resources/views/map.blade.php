@@ -249,9 +249,9 @@
                     "<form method='POST' action='{{ url('points') }}/" + feature.properties.id + "'>" +
                     '{{ csrf_field() }}' + '@method('DELETE')' +
                     "<button type='submit' class= 'btn btn-sm btn-danger' onclick='return confirm(`Yakin akan dihapus?`)'><i class='fa-solid fa-trash'></i></button>" +
-                    "</form>";
+                    "</form>" +
                 "</div>" +
-                "</div>";
+                "</div>" + "<br>" + "<p>Dibuat Oleh: " + feature.properties.user_created + "</p>";
 
 
                 layer.on({
@@ -290,9 +290,9 @@
                     "<form method='POST' action='{{ url('polylines') }}/" + feature.properties.id + "'>" +
                     '{{ csrf_field() }}' + '@method('DELETE')' +
                     "<button type='submit' class= 'btn btn-sm btn-danger' onclick='return confirm(`Yakin akan dihapus?`)'><i class='fa-solid fa-trash'></i></button>" +
-                    "</form>";
+                    "</form>" +
                 "</div>" +
-                "</div>";
+                "</div>" + "<br>" + "<p>Dibuat Oleh: " + feature.properties.user_created + "</p>";
                 layer.on({
                     click: function(e) {
                         polylines.bindPopup(popupContent);
@@ -329,9 +329,9 @@
                     "<form method='POST' action='{{ url('polygons') }}/" + feature.properties.id + "'>" +
                     '{{ csrf_field() }}' + '@method('DELETE')' +
                     "<button type='submit' class= 'btn btn-sm btn-danger' onclick='return confirm(`Yakin akan dihapus?`)'><i class='fa-solid fa-trash'></i></button>" +
-                    "</form>";
+                    "</form>" +
                 "</div>" +
-                "</div>";
+                "</div>" + "<br>" + "<p>Dibuat Oleh: " + feature.properties.user_created + "</p>";
                 layer.on({
                     click: function(e) {
                         polygons.bindPopup(popupContent);
