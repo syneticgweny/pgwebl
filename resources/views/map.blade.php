@@ -11,6 +11,8 @@
             width: 100%;
             height: calc(100vh - 56px);
         }
+
+
     </style>
 @endsection
 
@@ -166,7 +168,7 @@
 
     <script src="https://unpkg.com/@terraformer/wkt"></script>
     <script>
-        var map = L.map('map').setView([-5.3872221, 105.2554285], 13);
+        var map = L.map('map').setView([-5.065273384634835, 104.89055766392508], 9);
 
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -236,9 +238,9 @@
                 routeedit = routeedit.replace(':id', feature.properties.id);
 
 
-                var popupContent = "Nama: " + feature.properties.name + "<br>" +
-                    "Deskripsi: " + feature.properties.description + "<br>" +
-                    "Dibuat: " + feature.properties.created_at + "<br>" +
+                var popupContent = "<strong>Nama:</strong> " + feature.properties.name + "<br>" +
+                    "<strong>Deskripsi:</strong> " + feature.properties.description + "<br>" +
+                    "<strong>Dibuat:</strong>: " + feature.properties.created_at + "<br>" +
                     "<img src='{{ asset('storage/images') }}/" + feature.properties.image +
                     "' width='200' alt=''>" + "<br>" +
                     "<div class='row mt-4'>" +
