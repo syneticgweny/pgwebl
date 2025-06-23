@@ -6,13 +6,14 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css">
 
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+
+
     <style>
         #map {
             width: 100%;
             height: calc(100vh - 56px);
         }
-
-
     </style>
 @endsection
 
@@ -167,12 +168,35 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
     <script src="https://unpkg.com/@terraformer/wkt"></script>
+
+    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+
     <script>
         var map = L.map('map').setView([-5.065273384634835, 104.89055766392508], 9);
 
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
+
+        // GeoJSON Admin Lampung
+        var adminLampung = L.geoJson(null, {
+            style: {
+                color: "#3388ff",
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.2
+            },
+            onEachFeature: function(feature, layer) {
+                if (feature.properties && feature.properties.name) {
+                    layer.bindTooltip(feature.properties.name);
+                }
+            }
+        });
+
+        $.getJSON("{{ asset('storage/geojson/AdminLampung.geojson') }}", function(data) {
+            adminLampung.addData(data);
+            map.addLayer(adminLampung);
+        });
 
 
         /* Digitize Function */
@@ -237,31 +261,62 @@
                 var routeedit = "{{ route('points.edit', ':id') }}";
                 routeedit = routeedit.replace(':id', feature.properties.id);
 
-
                 var popupContent = "<strong>Nama:</strong> " + feature.properties.name + "<br>" +
                     "<strong>Deskripsi:</strong> " + feature.properties.description + "<br>" +
-                    "<strong>Dibuat:</strong>: " + feature.properties.created_at + "<br>" +
+                    "<strong>Dibuat:</strong> " + feature.properties.created_at + "<br>" +
                     "<img src='{{ asset('storage/images') }}/" + feature.properties.image +
                     "' width='200' alt=''>" + "<br>" +
                     "<div class='row mt-4'>" +
                     "<div class='col-6 text-end'>" +
-                    "<a href='" + routeedit +"'  class='btn btn-sm btn-warning'><i class='fa-solid fa-pen-to-square'></i></a>" +
+                    "<a href='" + routeedit +
+                    "'  class='btn btn-sm btn-warning'><i class='fa-solid fa-pen-to-square'></i></a>" +
                     "</div>" +
                     "<div class='col-6'>" +
                     "<form method='POST' action='{{ url('points') }}/" + feature.properties.id + "'>" +
                     '{{ csrf_field() }}' + '@method('DELETE')' +
                     "<button type='submit' class= 'btn btn-sm btn-danger' onclick='return confirm(`Yakin akan dihapus?`)'><i class='fa-solid fa-trash'></i></button>" +
                     "</form>" +
-                "</div>" +
-                "</div>" + "<br>" + "<p>Dibuat Oleh: " + feature.properties.user_created + "</p>";
-
+                    "</div>" +
+                    "</div>" + "<br>" + "<p>Dibuat Oleh: " + feature.properties.user_created + "</p>";
 
                 layer.on({
                     click: function(e) {
-                        point.bindPopup(popupContent);
+                        // Tampilkan popup
+                        layer.bindPopup(popupContent).openPopup();
+
+                        // Ambil lokasi pengguna dan buat rute
+                        navigator.geolocation.getCurrentPosition(function(position) {
+                            var userLatLng = L.latLng(position.coords.latitude, position
+                                .coords.longitude);
+                            var tujuan = e.latlng;
+
+                            // Hapus routing sebelumnya jika ada
+                            if (typeof window.routingControl !== "undefined" && window
+                                .routingControl !== null) {
+                                map.removeControl(window.routingControl);
+                            }
+
+                            // Buat routing baru
+                            window.routingControl = L.Routing.control({
+                                waypoints: [
+                                    userLatLng,
+                                    tujuan
+                                ],
+                                routeWhileDragging: false,
+                                draggableWaypoints: false,
+                                addWaypoints: false,
+                                createMarker: function(i, wp) {
+                                    return L.marker(wp.latLng).bindPopup(i ===
+                                        0 ? "Anda" : feature.properties.name
+                                        );
+                                }
+                            }).addTo(map);
+                        }, function() {
+                            alert("Gagal mendapatkan lokasi pengguna.");
+                        });
                     },
                     mouseover: function(e) {
-                        point.bindTooltip(feature.properties.name);
+                        layer.bindTooltip(feature.properties.name);
                     },
                 });
             },
@@ -270,6 +325,47 @@
             point.addData(data);
             map.addLayer(point);
         });
+
+        // Fungsi untuk mencari lokasi pengguna dan membuat rute ke tujuan (misalnya, pantai)
+        map.locate({
+            setView: true,
+            maxZoom: 9
+        });
+
+        map.on('locationfound', function(e) {
+            // Lokasi pengguna (koordinat saat ini)
+            var userLatLng = e.latlng;
+
+            // Titik tujuan: ganti koordinat ini dengan titik pantai tujuan
+            layer.on('click', function(e) {
+                var tujuanPantai = e.latlng; // atau dari geometry GeoJSON
+                // Panggil ulang routing di sini
+            });
+
+
+            // Tampilkan marker pengguna
+            L.marker(userLatLng).addTo(map).bindPopup("Lokasi Anda").openPopup();
+
+            // Routing dari lokasi pengguna ke tujuan
+            L.Routing.control({
+                waypoints: [
+                    userLatLng,
+                    tujuanPantai
+                ],
+                routeWhileDragging: false,
+                show: false,
+                createMarker: function(i, wp, nWps) {
+                    return L.marker(wp.latLng, {
+                        draggable: false
+                    }).bindPopup(i === 0 ? "Awal (Anda)" : "Tujuan (Pantai)");
+                }
+            }).addTo(map);
+        });
+
+        map.on('locationerror', function(e) {
+            alert("Lokasi tidak ditemukan. Pastikan izin lokasi diaktifkan.");
+        });
+
 
         // GeoJSON Polylines
         var polylines = L.geoJson(null, {
@@ -286,15 +382,16 @@
                     "<br>" +
                     "<div class='row mt-4'>" +
                     "<div class='col-6 text-end'>" +
-                    "<a href='" + routeedit +"'  class='btn btn-sm btn-warning'><i class='fa-solid fa-pen-to-square'></i></a>" +
+                    "<a href='" + routeedit +
+                    "'  class='btn btn-sm btn-warning'><i class='fa-solid fa-pen-to-square'></i></a>" +
                     "</div>" +
                     "<div class='col-6'>" +
                     "<form method='POST' action='{{ url('polylines') }}/" + feature.properties.id + "'>" +
                     '{{ csrf_field() }}' + '@method('DELETE')' +
                     "<button type='submit' class= 'btn btn-sm btn-danger' onclick='return confirm(`Yakin akan dihapus?`)'><i class='fa-solid fa-trash'></i></button>" +
                     "</form>" +
-                "</div>" +
-                "</div>" + "<br>" + "<p>Dibuat Oleh: " + feature.properties.user_created + "</p>";
+                    "</div>" +
+                    "</div>" + "<br>" + "<p>Dibuat Oleh: " + feature.properties.user_created + "</p>";
                 layer.on({
                     click: function(e) {
                         polylines.bindPopup(popupContent);
@@ -325,15 +422,16 @@
                     "<br>" +
                     "<div class='row mt-4'>" +
                     "<div class='col-6 text-end'>" +
-                    "<a href='" + routeedit +"'  class='btn btn-sm btn-warning'><i class='fa-solid fa-pen-to-square'></i></a>" +
+                    "<a href='" + routeedit +
+                    "'  class='btn btn-sm btn-warning'><i class='fa-solid fa-pen-to-square'></i></a>" +
                     "</div>" +
                     "<div class='col-6'>" +
                     "<form method='POST' action='{{ url('polygons') }}/" + feature.properties.id + "'>" +
                     '{{ csrf_field() }}' + '@method('DELETE')' +
                     "<button type='submit' class= 'btn btn-sm btn-danger' onclick='return confirm(`Yakin akan dihapus?`)'><i class='fa-solid fa-trash'></i></button>" +
                     "</form>" +
-                "</div>" +
-                "</div>" + "<br>" + "<p>Dibuat Oleh: " + feature.properties.user_created + "</p>";
+                    "</div>" +
+                    "</div>" + "<br>" + "<p>Dibuat Oleh: " + feature.properties.user_created + "</p>";
                 layer.on({
                     click: function(e) {
                         polygons.bindPopup(popupContent);
