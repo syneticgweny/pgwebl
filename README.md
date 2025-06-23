@@ -41,13 +41,6 @@ Dengan penyajian data berbasis spasial, pengguna dapat melihat titik-titik panta
 
 ---
 
-## 🔄 Rencana Update
-
-- 🔍 **Fitur Pencarian**: Cari pantai berdasarkan nama
-- ⭐ **Sistem Ulasan dan Rating**
-
----
-
 ## 🛠️ Teknologi yang Digunakan
 
 | Kategori     | Teknologi               |
@@ -65,7 +58,7 @@ Dengan penyajian data berbasis spasial, pengguna dapat melihat titik-titik panta
 
 ```bash
 # Clone repository
-git clone https://github.com/username/sagara-lampung.git
+git clone https://github.com/syneticgweny/pgwebl.git
 cd sagara-lampung
 
 # Install dependencies
